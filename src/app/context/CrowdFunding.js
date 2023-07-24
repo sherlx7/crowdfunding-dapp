@@ -2,15 +2,14 @@
 
 import React, {useState, useEffect} from 'react';
 import Web3Modal from "web3modal";
-import { ethers } from "ethers";
+// import { ethers } from "ethers";
 import { BrowserProvider, parseUnits } from "ethers";
 import { CrowdFundingABI,CrowdFundingAddress } from './contants';
 
-// const ethers = require("ethers")
+const ethers = require("ethers")
 
 const fetchContract = (signerOrProvider) => {
-    new ethers.Contract(CrowdFundingAddress,CrowdFundingABI,signerOrProvider
-        )
+    return new ethers.Contract(CrowdFundingAddress,CrowdFundingABI,signerOrProvider)
 }
 
 export const CrowdFundingContext = React.createContext();
@@ -30,7 +29,7 @@ export const CrowdFundingProvider = ({children}) => {
         //connection here is a web3modal provider
 
         //wrap the Web3Modal provider into an ethers provider 
-        const provider = await ethers.BrowserProvider(connection);
+        const provider = await ethers.providers.web3Provier(connection);
         const signer = provider.getSigner();
 
         //create a contract instance
@@ -44,7 +43,7 @@ export const CrowdFundingProvider = ({children}) => {
                 currentAccount, //owner
                 title,
                 description,
-                ethers.formatEther.parseUnits(amount,18),
+                ethers.utils.parseUnits(amount,18),
                 new Date(dateline).getTime() // deadline
             )
 
@@ -57,7 +56,7 @@ export const CrowdFundingProvider = ({children}) => {
     }
 
     const getCampaigns = async() => {
-        const provider = new ethers.BrowserProvider.JsonRpcProvider();
+        const provider = new ethers.providers.JsonRpcProvider();
         const contract = fetchContract(provider);
 
         const campaigns = await contract.getCampaigns();
@@ -66,9 +65,9 @@ export const CrowdFundingProvider = ({children}) => {
             owner:campaign.owner,
             title:campaign.title,
             description:campaign.description,
-            target:ethers.formatEther(campaign.target.toString()),
+            target:ethers.utils.formatEther(campaign.target.toString()),
             deadline:campaign.deadline.toNumber(),
-            amountCollected:ethers.formatEther(campaign.amountCollected.toString()),
+            amountCollected:ethers.utilsformatEther(campaign.amountCollected.toString()),
             pId:i
         }))
 
@@ -76,10 +75,10 @@ export const CrowdFundingProvider = ({children}) => {
     }
 
     const getUserCampaigns = async() => {
-        const provider = new ethers.BrowserProvider.JsonRpcProvider();
+        const provider = new ethers.providers.JsonRpcProvider();
         const contract = fetchContract(provider);
 
-        const allCampaigns = await contract.getCampaigns;
+        const allCampaigns = await contract.getCampaigns();
 
         const account = await window.ethereum.request({
             method:"eth_accounts",
@@ -94,9 +93,9 @@ export const CrowdFundingProvider = ({children}) => {
             owner:campaign.owner,
             title:campaign.title,
             description:campaign.description,
-            target:ethers.formatEther(campaign.target.toString()),
+            target:ethers.utils.formatEther(campaign.target.toString()),
             deadline:campaign.deadline.toNumber(),
-            amountCollected:ethers.formatEther(campaign.amountCollected.toString()),
+            amountCollected:ethers.utils.formatEther(campaign.amountCollected.toString()),
             pId:i,
         }));
 
@@ -106,7 +105,7 @@ export const CrowdFundingProvider = ({children}) => {
     const donate = async (pId,amount) => {
         const web3Modal = new Web3Modal;
         const connection = await web3Modal.connect();  
-        const provider = await ethers.BrowserProvider(connection);
+        const provider = await ethers.providers.web3Provier(connection);
         const signer = provider.getSigner();
         const contract = fetchContract(signer);
 
@@ -121,7 +120,7 @@ export const CrowdFundingProvider = ({children}) => {
     }
 
     const getDonations = async (pId) => {
-        const provider = new ethers.BrowserProvider.JsonRpcProvider();
+        const provider = new ethers.providers.JsonRpcProvider();
         const contract = fetchContract(provider);
 
         const donations = await contract.getDonators(pId);
@@ -132,7 +131,7 @@ export const CrowdFundingProvider = ({children}) => {
         for (let i=0; i<numberOfDonations;i++) {
             parsedDonations.push({
                 donator:donations[0][i],
-                donation:ethers.formatEther(donations[1][i].toString())
+                donation:ethers.utils.formatEther(donations[1][i].toString())
             });
         }
 
