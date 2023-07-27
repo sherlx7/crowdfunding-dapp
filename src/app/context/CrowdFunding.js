@@ -29,13 +29,11 @@ export const CrowdFundingProvider = ({children}) => {
         //connection here is a web3modal provider
 
         //wrap the Web3Modal provider into an ethers provider 
-        const provider = await ethers.providers.web3Provier(connection);
+        const provider = new ethers.providers.Web3Provider(connection);
         const signer = provider.getSigner();
 
         //create a contract instance
         const contract = fetchContract(signer);
-
-        console.log(currentAccount);
 
         //calls createCampaign function on contract instance
         try {
@@ -44,22 +42,28 @@ export const CrowdFundingProvider = ({children}) => {
                 title,
                 description,
                 ethers.utils.parseUnits(amount,18),
-                new Date(dateline).getTime() // deadline
+                new Date(deadline).getTime() // deadline
             )
 
-            await transaction.wait();
-            console.log("contract call success",transaction);
+            const receipt = await transaction.wait();
+            console.log("receipt is", receipt)
 
         } catch(error) {
             console.log("contract call error", error);
         }
     }
 
-    const getCampaigns = async() => {
+    const getCampaigns = async () => {
+        // return ["hello","world"];
+
         const provider = new ethers.providers.JsonRpcProvider();
         const contract = fetchContract(provider);
 
+        console.log(contract)
+
         const campaigns = await contract.getCampaigns();
+
+        console.log("this is the campaign",campaigns)
 
         const parsedCampaigns = campaigns.map((campaign,i) => ({
             owner:campaign.owner,
@@ -67,11 +71,12 @@ export const CrowdFundingProvider = ({children}) => {
             description:campaign.description,
             target:ethers.utils.formatEther(campaign.target.toString()),
             deadline:campaign.deadline.toNumber(),
-            amountCollected:ethers.utilsformatEther(campaign.amountCollected.toString()),
+            amountCollected:ethers.utils.formatEther(campaign.amountCollected.toString()),
             pId:i
         }))
 
         return parsedCampaigns;
+
     }
 
     const getUserCampaigns = async() => {
@@ -86,7 +91,9 @@ export const CrowdFundingProvider = ({children}) => {
 
         const currentUser = account[0];
         const filterCampaigns = allCampaigns.filter((campaign)=>{
-            campaign.owner="0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+            const campaignCopy = { ...campaign };
+            campaignCopy.owner = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+            return campaignCopy;
         })
 
         const userData = filterCampaigns.map((campaign,i)=>({
@@ -105,12 +112,12 @@ export const CrowdFundingProvider = ({children}) => {
     const donate = async (pId,amount) => {
         const web3Modal = new Web3Modal;
         const connection = await web3Modal.connect();  
-        const provider = await ethers.providers.web3Provier(connection);
+        const provider = new ethers.providers.Web3Provider(connection);
         const signer = provider.getSigner();
         const contract = fetchContract(signer);
 
         const campaignData = await contract.donateToCampaign(pId,{
-            value: ethers.parseEther(amount),
+            value: ethers.utils.parseEther(amount),
         });
 
         await campaignData.wait();
@@ -146,7 +153,7 @@ export const CrowdFundingProvider = ({children}) => {
             }
 
             const accounts = await window.ethereum.request({
-                methods:"eth_accounts",
+                method:"eth_accounts",
             });
 
             if (accounts.length){
@@ -155,6 +162,7 @@ export const CrowdFundingProvider = ({children}) => {
                 console.log("No account found");
             }
         } catch (error) {
+            console.log(error)
             console.log("Something went wrong when connecting to the wallet")
         }
     };
@@ -169,12 +177,15 @@ export const CrowdFundingProvider = ({children}) => {
                 return setOpenError(true),setError("Install metamask")
             }
 
+            console.log("have window eth")
+
             const accounts = await window.ethereum.request({
-                methods:"eth_requestAccounts",
+                method:"eth_requestAccounts",
             });
 
             setCurrentAccount(accounts[0]);
         } catch (error) {
+            console.log(error)
             console.log("Error while connecting to wallet")
         }
     };

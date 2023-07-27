@@ -2,7 +2,7 @@
 
 import React,{useState} from 'react'
 
-const Hero= ({titleData,createCampaign}) => {
+const Hero= ({titleData,createCampaign,getCampaigns}) => {
   const [campaign,setCampaign] = useState({
     title:"",
     description:"",
@@ -10,10 +10,24 @@ const Hero= ({titleData,createCampaign}) => {
     deadline:"",
   });
 
+  const [createdCampaign, setCreatedCampaign] = useState(false);
+
   const createNewCampaign = async (e) => {
     e.preventDefault();
     try {
       const data = await createCampaign(campaign);
+      console.log("created and pass control to hero component")
+      setCreatedCampaign(true)
+      setTimeout(() => {
+        setCreatedCampaign(false); // Set the modal state to close
+      }, 5000);
+
+      console.log("point before getting campaign")
+
+      const getCampaignsData = await getCampaigns()
+      console.log("point after getting campaign")
+
+      console.log(getCampaignsData)
     } catch (error) {
       console.log(error);
     }
@@ -165,6 +179,12 @@ const Hero= ({titleData,createCampaign}) => {
                     >
                       Create Campaign
                     </button>
+                    {createdCampaign && (
+                              <div className="modal">
+                              <h2>Campaign Created Successfully!</h2>
+                              {/* Add more content or actions as needed */}
+                            </div>
+                    )}
                 </div>
               </form>
             </div>

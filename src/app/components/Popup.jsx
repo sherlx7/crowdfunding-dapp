@@ -2,26 +2,39 @@
 
 import React,{useState, useEffect} from 'react'
 
-const Popup = ({setOpenModal, getDonations,donateCampaign,donate}) => {
+const Popup = ({setOpenModal, getDonations,donate,donateToCampaign}) => {
     const [amount,setAmount] = useState("");
     const [allDonationData, setAllDonationData] = useState();
 
-    const createDination = async() => {
+    const createDonation = async() => {
+        console.log("Creating donation")
         try {
-            const data = await donateFunction(donate.pId,amount);
+            const data = await donateToCampaign(donate.pId,amount);
             console.log(data);
         } catch (error) {
             console.log(error);
         }
     };
+    // useEffect(()=>{
+    //     const donationsListData = getDonations(donate.pId);
+    //     return async() => {
+    //         const donationData = await donationsListData;
+    //         setAllDonationData(donationData);
+    //     }
+    // },[]);
 
-    useEffect(()=>{
-        const donationsListData = getDonations(donate.pId);
-        return async() => {
-            const donationData = await donationsListData;
-            setAllDonationData(donationData);
-        }
-    },[]);
+    useEffect(() => {
+        const fetchDonationData = async () => {
+            try {
+                const donationData = await getDonations(donate.pId);
+                setAllDonationData(donationData);
+            } catch (error) {
+                console.log("Error fetching donation data:", error);
+            }
+        };
+
+        fetchDonationData();
+    }, [donate.pId]);
 
   return (
     <>
@@ -39,7 +52,7 @@ const Popup = ({setOpenModal, getDonations,donateCampaign,donate}) => {
                     opacity-5 float-right text-3xl leading-none font-semibold outline-none
                     focus:outline-none'
                     onClick={()=>setOpenModal(false)}>
-                        <span className='bg-transparent text-black opacity-5 h-6 w-6
+                        <span className='bg-transparent text-black h-6 w-6
                         text-2xl block outline-none focus:outline-none'>
                             x
                         </span>
@@ -87,7 +100,7 @@ const Popup = ({setOpenModal, getDonations,donateCampaign,donate}) => {
                     uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none 
                     focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 '
                     type="button"
-                    onClick={()=>createDination()}
+                    onClick={()=>createDonation()}
                     >
                         Donate
                     </button>

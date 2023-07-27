@@ -1,7 +1,6 @@
 import React from 'react'
 
-const Card= ({allcampaign, setOpenModal, setDonate,title}) => {
-  console.log(allcampaign);
+const Card= ({allCampaign, setOpenModal, setDonate,title}) => {
 
   const daysLeft = (deadline) => {
     const difference = new Date(deadline).getTime() - Date.now();
@@ -14,7 +13,7 @@ const Card= ({allcampaign, setOpenModal, setDonate,title}) => {
     md:px-24 lg:px-8 lg:py-20'>
       <p className='py-16 text-2xl font-bold leading-5' >{title}</p>
       <div className='grid gap-5 lg:grid-cols-3 sm:max-w-sm sm:mx-auto lg:max-w-full'>
-        {allcampaign?.map((campaign,i)=>(
+        {allCampaign?.map((campaign,i)=>(
           <div
             onClick={()=>(setDonate(campaign),setOpenModal(true))}
             key={i+1}

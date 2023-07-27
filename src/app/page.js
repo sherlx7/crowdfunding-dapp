@@ -15,18 +15,35 @@ export default function Home() {
     getUserCampaigns, 
     getDonations } = useContext(CrowdFundingContext);
 
-  const [allCampaign, setAllCampaign] = useState("");
-  const [userCampaign, setUserCampaign] = useState("");
+  const [allCampaign, setAllCampaign] = useState([]);
+  const [userCampaign, setUserCampaign] = useState([]);
+
+  // useEffect(() => {
+  //   const getCampaignsData = getCampaigns();
+  //   const userCampaignsData = getUserCampaigns();
+  //   return async () => {
+  //     const allData = await getCampaignsData;
+  //     const userData = await userCampaignsData;
+  //     console.log(allData);
+  //     console.log(userData);
+  //     setAllCampaign(allData);
+  //     setUserCampaign(userData);
+  //   };
+  // }, []);
 
   useEffect(() => {
-    const getCampaignsData = getCampaigns();
-    const userCampaignsData = getUserCampaigns();
-    return async () => {
-      const allData = await getCampaignsData;
-      const userData = await userCampaignsData;
-      setAllCampaign(allData);
-      setUserCampaign(userData);
+    const fetchData = async () => {
+      try {
+        const allData = await getCampaigns();
+        const userData = await getUserCampaigns();
+        setAllCampaign(allData);
+        setUserCampaign(userData);
+      } catch (error) {
+        console.log("Error fetching data:", error);
+      }
     };
+
+    fetchData();
   }, []);
 
   //DONATE POPUP MODAL
@@ -36,12 +53,13 @@ export default function Home() {
 
   return (
     <>
-      <Hero titleData={titleData} createCampaign={createCampaign} />
+      <Hero titleData={titleData} createCampaign={createCampaign} getCampaigns={getCampaigns}/>
       <Card
         title="All Listed Campaign"
         allCampaign={allCampaign}
         setOpenModal={setOpenModal}
-        setDonate={setDonateCampaign} />
+        setDonate={setDonateCampaign}
+         />
       <Card
         title="Your Created Campaign"
         allCampaign={userCampaign}
@@ -51,9 +69,14 @@ export default function Home() {
       {openModal && (
         <Popup 
           setOpenModal={setOpenModal}
-          setDonations={getDonations}
+          getDonations={getDonations}
           donate={donateCampaign}
-          donateFunction={donate}
+          donateToCampaign={donate}
+          // getCampaigns, 
+          // createCampaign, 
+          // donate,
+          // getUserCampaigns, 
+          // getDonation
         />
       )}
     </>
