@@ -1,3 +1,14 @@
+Project Introduction:
+This is a crowdfunding decentralised application, where users are able to create crowdfunding campaigns as well as donate to crowdfunding campaigns. 
+
+Tech stack used:
+- solidity
+- hardhat and ethersjs
+- metamask
+- nextjs
+- javascript
+- vanilla CSS
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
